@@ -10,8 +10,11 @@
         padding: 0;
         box-sizing: border-box;
       }
-      body {
+      html, body {
         overflow: hidden;
+        width: 100%;
+        height: 100%;
+        position: fixed;
         font-family: sans-serif;
         transition: background-color 0.5s;
       }
@@ -35,12 +38,9 @@
         background: none;
         border: none;
         cursor: pointer;
-
         width: 45px;
         height: 45px;
-
         border-radius: 100%;
-
       }
       
       .pallet-btn:hover {
@@ -152,7 +152,7 @@
 
         document.body.style.backgroundColor = color.bg;
         document.body.style.color = color.text;
-        wheel.style.borderColor = color.wheel;
+        wheel.style.borderColor = color.wheelBg;
       });
 
       colors.forEach((color, i) => {
@@ -165,7 +165,7 @@
           e.stopPropagation();
           document.body.style.backgroundColor = color.bg;
           document.body.style.color = color.text;
-          wheel.style.borderColor = color.wheel;
+          wheel.style.borderColor = color.wheelBg;
         });
         container.appendChild(div);
       });
@@ -196,13 +196,31 @@
         startAngle = getAngle(e.clientX, e.clientY) - currentRotation;
       });
 
+      wheel.addEventListener("touchstart", (e) => {
+        isDragging = true;
+        wheel.style.transition =
+          "width 0.4s, height 0.4s, border-width 0.4s, opacity 0.3s";
+        const touch = e.touches[0];
+        startAngle = getAngle(touch.clientX, touch.clientY) - currentRotation;
+        e.preventDefault();
+      }, { passive: false });
+
       window.addEventListener("mousemove", (e) => {
         if (!isDragging) return;
         currentRotation = getAngle(e.clientX, e.clientY) - startAngle;
         wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
       });
 
+      window.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        currentRotation = getAngle(touch.clientX, touch.clientY) - startAngle;
+        wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+        e.preventDefault();
+      }, { passive: false });
+
       window.addEventListener("mouseup", () => (isDragging = false));
+      window.addEventListener("touchend", () => (isDragging = false));
     </script>
   </body>
 </html>
