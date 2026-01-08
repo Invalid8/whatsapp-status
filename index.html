@@ -115,6 +115,54 @@
           margin: -17.5px;
         }
       }
+
+      main {
+        min-height: calc(100vh - 130px);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: inherit;
+      }
+
+      main .text-editor {
+        font-size: clamp(3.5rem, 3.8vw + 0.5rem, 2.25rem);
+      }
+
+      .text-editor {
+        text-align: center;
+        margin: 0 auto;
+        font-family: sans-serif;
+        color: inherit;
+        max-width: 80svw;
+        max-height: calc(100vh - 130px);
+
+        box-sizing: border-box;
+        resize: none;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        field-sizing: content;
+        width: 100%;
+        max-height: 70vh;
+        overflow-y: hidden;
+      }
+
+      .text-editor,
+      .text-editor:focus,
+      [contenteditable].text-editor:focus {
+        border: none !important;
+        background-color: transparent;
+        outline: none;
+      }
+
+      .text-editor::placeholder {
+        color: inherit;
+        opacity: 0.6;
+      }
     </style>
   </head>
   <body>
@@ -145,6 +193,15 @@
       </nav>
     </header>
 
+    <main>
+      <textarea
+        type="text"
+        class="text-editor"
+        placeholder="Type a text"
+        rows="1"
+      ></textarea>
+    </main>
+
     <script>
       const palletBtn = document.getElementById("palletBtn");
       const wheel = document.getElementById("wheel");
@@ -153,10 +210,10 @@
       const colors = [
         { bg: "#075e54", text: "white", wheelBg: "#000000" },
         { bg: "#128c7e", text: "white", wheelBg: "#000000" },
-        { bg: "#25d366", text: "black", wheelBg: "#075e54" },
-        { bg: "#dcf8c6", text: "black", wheelBg: "#128c7e" },
+        { bg: "#25d366", text: "black", wheelBg: "#000000" },
+        { bg: "#dcf8c6", text: "black", wheelBg: "#000000" },
         { bg: "#34b7f1", text: "black", wheelBg: "#000000" },
-        { bg: "#ece5dd", text: "black", wheelBg: "#075e54" },
+        { bg: "#ece5dd", text: "black", wheelBg: "#000000" },
         { bg: "#ff2e74", text: "white", wheelBg: "#000000" },
         { bg: "#7a1fa2", text: "white", wheelBg: "#000000" },
         { bg: "#c62828", text: "white", wheelBg: "#000000" },
@@ -184,6 +241,12 @@
         wheel.style.borderColor = color.wheelBg;
 
         updateTranslateDistance();
+
+        const tx = document.querySelector(".text-editor");
+        tx.addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = this.scrollHeight + "px";
+        });
       });
 
       window.addEventListener("resize", updateTranslateDistance);
