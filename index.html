@@ -78,6 +78,14 @@
         pointer-events: auto;
       }
 
+      @media (max-width: 768px) {
+        .wheel.show-wheel {
+          width: 250px;
+          height: 250px;
+          border-width: 60px;
+        }
+      }
+
       .items {
         position: absolute;
         width: 100%;
@@ -98,6 +106,14 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         touch-action: none;
+      }
+
+      @media (max-width: 768px) {
+        .item {
+          width: 35px;
+          height: 35px;
+          margin: -17.5px;
+        }
       }
     </style>
   </head>
@@ -148,6 +164,17 @@
         { bg: "#ff8f00", text: "black", wheelBg: "#000000" },
       ];
 
+      let translateDistance = 135;
+
+      function updateTranslateDistance() {
+        translateDistance = window.innerWidth <= 768 ? 95 : 135;
+        const items = document.querySelectorAll(".item");
+        items.forEach((item, i) => {
+          const angle = i * (360 / colors.length);
+          item.style.transform = `rotate(${angle}deg) translate(${translateDistance}px) rotate(-${angle}deg)`;
+        });
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         const randIndex = Math.floor(Math.random() * colors.length);
         const color = colors[randIndex];
@@ -155,14 +182,18 @@
         document.body.style.backgroundColor = color.bg;
         document.body.style.color = color.text;
         wheel.style.borderColor = color.wheelBg;
+
+        updateTranslateDistance();
       });
+
+      window.addEventListener("resize", updateTranslateDistance);
 
       colors.forEach((color, i) => {
         const div = document.createElement("div");
         div.className = "item";
         div.style.backgroundColor = color.bg;
         const angle = i * (360 / colors.length);
-        div.style.transform = `rotate(${angle}deg) translate(135px) rotate(-${angle}deg)`;
+        div.style.transform = `rotate(${angle}deg) translate(${translateDistance}px) rotate(-${angle}deg)`;
 
         let clickStart = null;
         let moved = false;
