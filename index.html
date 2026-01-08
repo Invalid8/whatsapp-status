@@ -126,8 +126,16 @@
         color: inherit;
       }
 
-      main .text-editor {
+      .text-editor,
+      .text-editor::placeholder {
         font-size: clamp(3.5rem, 3.8vw + 0.5rem, 2.25rem);
+      }
+
+      @media (max-width: 768px) {
+        .text-editor,
+        .text-editor::placeholder {
+          font-size: clamp(2.5rem, 3.8vw + 0.5rem, 2.25rem);
+        }
       }
 
       .text-editor {
