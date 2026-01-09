@@ -139,7 +139,7 @@
         border: none;
         background-color: transparent;
         outline: none;
-        overflow-y: auto;
+        overflow: hidden;
         line-height: 1.4;
         font-size: clamp(2rem, 5vw, 4rem);
       }
@@ -290,6 +290,7 @@
         document.body.style.color = color.text;
         wheel.style.borderColor = color.wheelBg;
 
+        updateWordCount();
         updateTranslateDistance();
         adjustTextareaHeight();
       });
