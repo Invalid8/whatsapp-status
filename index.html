@@ -124,18 +124,7 @@
         align-items: center;
         text-align: center;
         color: inherit;
-      }
-
-      .text-editor,
-      .text-editor::placeholder {
-        font-size: clamp(3.5rem, 3.8vw + 0.5rem, 2.25rem);
-      }
-
-      @media (max-width: 768px) {
-        .text-editor,
-        .text-editor::placeholder {
-          font-size: clamp(2.5rem, 3.8vw + 0.5rem, 2.25rem);
-        }
+        padding: 20px;
       }
 
       .text-editor {
@@ -143,33 +132,38 @@
         margin: 0 auto;
         font-family: sans-serif;
         color: inherit;
-        max-width: 80svw;
-        max-height: calc(100vh - 130px);
-
+        max-width: 85vw;
+        width: 100%;
         box-sizing: border-box;
         resize: none;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        field-sizing: content;
-        width: 100%;
-        max-height: 70vh;
-        overflow-y: hidden;
-      }
-
-      .text-editor,
-      .text-editor:focus,
-      [contenteditable].text-editor:focus {
-        border: none !important;
+        border: none;
         background-color: transparent;
         outline: none;
+        overflow-y: auto;
+        line-height: 1.4;
+        font-size: clamp(2rem, 5vw, 4rem);
+      }
+
+      @media (max-width: 768px) {
+        .text-editor {
+          font-size: clamp(1.5rem, 6vw, 3rem);
+        }
       }
 
       .text-editor::placeholder {
         color: inherit;
         opacity: 0.6;
+      }
+
+      .word-count {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        font-size: 14px;
+        opacity: 0.7;
+        padding: 8px 12px;
+        border-radius: 20px;
+        background-color: rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
@@ -184,7 +178,6 @@
               height="24"
               width="24"
               preserveAspectRatio="xMidYMid meet"
-              class=""
               fill="none"
             >
               <title>Palette</title>
@@ -206,14 +199,20 @@
         type="text"
         class="text-editor"
         placeholder="Type a text"
-        rows="1"
+        id="textEditor"
       ></textarea>
     </main>
+
+    <div class="word-count" id="wordCount">0 / 500 words</div>
 
     <script>
       const palletBtn = document.getElementById("palletBtn");
       const wheel = document.getElementById("wheel");
       const container = document.getElementById("itemsContainer");
+      const textEditor = document.getElementById("textEditor");
+      const wordCount = document.getElementById("wordCount");
+
+      const MAX_WORDS = 500;
 
       const colors = [
         { bg: "#075e54", text: "white", wheelBg: "#000000" },
@@ -240,6 +239,49 @@
         });
       }
 
+      function adjustTextareaHeight() {
+        textEditor.style.height = "auto";
+        const maxHeight = window.innerHeight - 200;
+        const newHeight = Math.min(textEditor.scrollHeight, maxHeight);
+        textEditor.style.height = newHeight + "px";
+
+        if (textEditor.scrollHeight > maxHeight) {
+          const currentValue = textEditor.value;
+          while (
+            textEditor.scrollHeight > maxHeight &&
+            textEditor.value.length > 0
+          ) {
+            textEditor.value = textEditor.value.slice(0, -1);
+            textEditor.style.height = "auto";
+            textEditor.style.height =
+              Math.min(textEditor.scrollHeight, maxHeight) + "px";
+          }
+          if (textEditor.value !== currentValue) {
+            updateWordCount();
+          }
+        }
+      }
+
+      function countWords(text) {
+        const trimmed = text.trim();
+        if (!trimmed) return 0;
+        return trimmed.split(/\s+/).length;
+      }
+
+      function updateWordCount() {
+        const text = textEditor.value;
+        const words = countWords(text);
+        wordCount.textContent = `${words} / ${MAX_WORDS} words`;
+
+        if (words > MAX_WORDS) {
+          const wordsArray = text.trim().split(/\s+/);
+          const limitedWords = wordsArray.slice(0, MAX_WORDS);
+          textEditor.value = limitedWords.join(" ");
+          wordCount.textContent = `${MAX_WORDS} / ${MAX_WORDS} words`;
+          adjustTextareaHeight();
+        }
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         const randIndex = Math.floor(Math.random() * colors.length);
         const color = colors[randIndex];
@@ -249,15 +291,18 @@
         wheel.style.borderColor = color.wheelBg;
 
         updateTranslateDistance();
-
-        const tx = document.querySelector(".text-editor");
-        tx.addEventListener("input", function () {
-          this.style.height = "auto";
-          this.style.height = this.scrollHeight + "px";
-        });
+        adjustTextareaHeight();
       });
 
-      window.addEventListener("resize", updateTranslateDistance);
+      textEditor.addEventListener("input", () => {
+        adjustTextareaHeight();
+        updateWordCount();
+      });
+
+      window.addEventListener("resize", () => {
+        updateTranslateDistance();
+        adjustTextareaHeight();
+      });
 
       colors.forEach((color, i) => {
         const div = document.createElement("div");
@@ -344,32 +389,40 @@
         );
       }
 
-      wheel.addEventListener("mousedown", (e) => {
+      function handleDragStart(clientX, clientY, e) {
         if (e.target.classList.contains("item")) return;
         isDragging = true;
         wheel.style.transition =
           "width 0.4s, height 0.4s, border-width 0.4s, opacity 0.3s";
-        startAngle = getAngle(e.clientX, e.clientY) - currentRotation;
+        startAngle = getAngle(clientX, clientY) - currentRotation;
+      }
+
+      function handleDragMove(clientX, clientY) {
+        if (!isDragging) return;
+        currentRotation = getAngle(clientX, clientY) - startAngle;
+        wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+      }
+
+      function handleDragEnd() {
+        isDragging = false;
+      }
+
+      wheel.addEventListener("mousedown", (e) => {
+        handleDragStart(e.clientX, e.clientY, e);
       });
 
       wheel.addEventListener(
         "touchstart",
         (e) => {
-          if (e.target.classList.contains("item")) return;
-          isDragging = true;
-          wheel.style.transition =
-            "width 0.4s, height 0.4s, border-width 0.4s, opacity 0.3s";
           const touch = e.touches[0];
-          startAngle = getAngle(touch.clientX, touch.clientY) - currentRotation;
+          handleDragStart(touch.clientX, touch.clientY, e);
           e.preventDefault();
         },
         { passive: false }
       );
 
       window.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        currentRotation = getAngle(e.clientX, e.clientY) - startAngle;
-        wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+        handleDragMove(e.clientX, e.clientY);
       });
 
       window.addEventListener(
@@ -377,15 +430,14 @@
         (e) => {
           if (!isDragging) return;
           const touch = e.touches[0];
-          currentRotation = getAngle(touch.clientX, touch.clientY) - startAngle;
-          wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+          handleDragMove(touch.clientX, touch.clientY);
           e.preventDefault();
         },
         { passive: false }
       );
 
-      window.addEventListener("mouseup", () => (isDragging = false));
-      window.addEventListener("touchend", () => (isDragging = false));
+      window.addEventListener("mouseup", handleDragEnd);
+      window.addEventListener("touchend", handleDragEnd);
     </script>
   </body>
 </html>
