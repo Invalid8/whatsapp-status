@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,14 +19,12 @@
         font-family: sans-serif;
         transition: background-color 0.5s;
       }
-
       header .h-nav {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
       }
-
       .btn-wheel {
         position: relative;
         width: 45px;
@@ -43,41 +41,44 @@
         height: 45px;
         border-radius: 100%;
       }
-
       .pallet-btn:hover {
-        transition: 0.5s ease-in;
-        transition-property: background-color;
         background-color: #ffffff33;
+        transition: background-color 0.5s ease-in;
       }
-
       .wheel {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) rotate(0deg);
         width: 0;
         height: 0;
-        border: 0px solid #000000;
+        border: 0px solid #000;
         border-radius: 50%;
         z-index: 40;
         opacity: 0;
-        transition: width 0.4s ease, height 0.4s ease, border-width 0.4s ease,
-          opacity 0.3s ease;
+        transform: translate(-50%, -50%) scale(0.85);
+        transition:
+          width 0.4s ease,
+          height 0.4s ease,
+          border-width 0.4s ease,
+          opacity 0.3s ease,
+          transform 0.3s ease;
         pointer-events: none;
         overflow: visible;
         display: flex;
         align-items: center;
         justify-content: center;
       }
-
       .wheel.show-wheel {
         width: 350px;
         height: 350px;
         border-width: 80px;
         opacity: 1;
-        pointer-events: auto;
+        pointer-events: none;
+        transform: translate(-50%, -50%) scale(0.85);
       }
-
+      .wheel.show-wheel.active-wheel {
+        transform: translate(-50%, -50%) scale(1);
+      }
       @media (max-width: 768px) {
         .wheel.show-wheel {
           width: 250px;
@@ -85,15 +86,15 @@
           border-width: 60px;
         }
       }
-
       .items {
         position: absolute;
         width: 100%;
         height: 100%;
         top: 0;
         left: 0;
+        z-index: 41;
+        pointer-events: none;
       }
-
       .item {
         position: absolute;
         top: 50%;
@@ -106,8 +107,19 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         touch-action: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        transition:
+          filter 0.15s ease,
+          transform 0.15s ease;
+        pointer-events: auto;
       }
-
+      .item:hover {
+        filter: brightness(1.15);
+      }
+      .wheel.dragging .item {
+        pointer-events: none;
+      }
       @media (max-width: 768px) {
         .item {
           width: 35px;
@@ -115,7 +127,31 @@
           margin: -17.5px;
         }
       }
-
+      .wheel-hit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 38;
+        pointer-events: none;
+        transition:
+          width 0.4s ease,
+          height 0.4s ease;
+      }
+      .wheel.show-wheel ~ .wheel-hit {
+        width: 430px;
+        height: 430px;
+        pointer-events: auto;
+      }
+      @media (max-width: 768px) {
+        .wheel.show-wheel ~ .wheel-hit {
+          width: 310px;
+          height: 310px;
+        }
+      }
       main {
         min-height: calc(100vh - 160px);
         width: 100%;
@@ -126,7 +162,6 @@
         color: inherit;
         padding: 20px;
       }
-
       .text-editor {
         text-align: center;
         margin: 0 auto;
@@ -143,18 +178,15 @@
         line-height: 1.4;
         font-size: clamp(2rem, 5vw, 4rem);
       }
-
       @media (max-width: 768px) {
         .text-editor {
           font-size: clamp(1.5rem, 6vw, 3rem);
         }
       }
-
       .text-editor::placeholder {
         color: inherit;
         opacity: 0.6;
       }
-
       .word-count {
         position: fixed;
         bottom: 20px;
@@ -184,36 +216,35 @@
               <path
                 d="M12 22C10.6333 22 9.34167 21.7375 8.125 21.2125C6.90833 20.6875 5.84583 19.9708 4.9375 19.0625C4.02917 18.1542 3.3125 17.0917 2.7875 15.875C2.2625 14.6583 2 13.3667 2 12C2 10.6167 2.27083 9.31667 2.8125 8.1C3.35417 6.88333 4.0875 5.825 5.0125 4.925C5.9375 4.025 7.01667 3.3125 8.25 2.7875C9.48333 2.2625 10.8 2 12.2 2C13.5333 2 14.7917 2.22917 15.975 2.6875C17.1583 3.14583 18.1958 3.77917 19.0875 4.5875C19.9792 5.39583 20.6875 6.35417 21.2125 7.4625C21.7375 8.57083 22 9.76667 22 11.05C22 12.9667 21.4167 14.4375 20.25 15.4625C19.0833 16.4875 17.6667 17 16 17H14.15C14 17 13.8958 17.0417 13.8375 17.125C13.7792 17.2083 13.75 17.3 13.75 17.4C13.75 17.6 13.875 17.8875 14.125 18.2625C14.375 18.6375 14.5 19.0667 14.5 19.55C14.5 20.3833 14.2708 21 13.8125 21.4C13.3542 21.8 12.75 22 12 22ZM6.5 13C6.93333 13 7.29167 12.8583 7.575 12.575C7.85833 12.2917 8 11.9333 8 11.5C8 11.0667 7.85833 10.7083 7.575 10.425C7.29167 10.1417 6.93333 10 6.5 10C6.06667 10 5.70833 10.1417 5.425 10.425C5.14167 10.7083 5 11.0667 5 11.5C5 11.9333 5.14167 12.2917 5.425 12.575C5.70833 12.8583 6.06667 13 6.5 13ZM9.5 9C9.93333 9 10.2917 8.85833 10.575 8.575C10.8583 8.29167 11 7.93333 11 7.5C11 7.06667 10.8583 6.70833 10.575 6.425C10.2917 6.14167 9.93333 6 9.5 6C9.06667 6 8.70833 6.14167 8.425 6.425C8.14167 6.70833 8 7.06667 8 7.5C8 7.93333 8.14167 8.29167 8.425 8.575C8.70833 8.85833 9.06667 9 9.5 9ZM14.5 9C14.9333 9 15.2917 8.85833 15.575 8.575C15.8583 8.29167 16 7.93333 16 7.5C16 7.06667 15.8583 6.70833 15.575 6.425C15.2917 6.14167 14.9333 6 14.5 6C14.0667 6 13.7083 6.14167 13.425 6.425C13.1417 6.70833 13 7.06667 13 7.5C13 7.93333 13.1417 8.29167 13.425 8.575C13.7083 8.85833 14.0667 9 14.5 9ZM17.5 13C17.9333 13 18.2917 12.8583 18.575 12.575C18.8583 12.2917 19 11.9333 19 11.5C19 11.0667 18.8583 10.7083 18.575 10.425C18.2917 10.1417 17.9333 10 17.5 10C17.0667 10 16.7083 10.1417 16.425 10.425C16.1417 10.7083 16 11.0667 16 11.5C16 11.9333 16.1417 12.2917 16.425 12.575C16.7083 12.8583 17.0667 13 17.5 13ZM12 20C12.15 20 12.2708 19.9583 12.3625 19.875C12.4542 19.7917 12.5 19.6833 12.5 19.55C12.5 19.3167 12.375 19.0417 12.125 18.725C11.875 18.4083 11.75 17.9333 11.75 17.3C11.75 16.6 11.9917 16.0417 12.475 15.625C12.9583 15.2083 13.55 15 14.25 15H16C17.1 15 18.0417 14.6792 18.825 14.0375C19.6083 13.3958 20 12.4 20 11.05C20 9.03333 19.2292 7.35417 17.6875 6.0125C16.1458 4.67083 14.3167 4 12.2 4C9.93333 4 8 4.775 6.4 6.325C4.8 7.875 4 9.76667 4 12C4 14.2167 4.77917 16.1042 6.3375 17.6625C7.89583 19.2208 9.78333 20 12 20Z"
                 fill="currentColor"
-              ></path>
+              />
             </svg>
           </button>
           <div class="wheel" id="wheel">
             <div class="items" id="itemsContainer"></div>
           </div>
+          <div class="wheel-hit" id="wheelHit"></div>
         </div>
       </nav>
     </header>
 
     <main>
       <textarea
-        type="text"
         class="text-editor"
         placeholder="Type a text"
         id="textEditor"
       ></textarea>
     </main>
-
     <div class="word-count" id="wordCount">0 / 500 words</div>
 
     <script>
       const palletBtn = document.getElementById("palletBtn");
       const wheel = document.getElementById("wheel");
-      const container = document.getElementById("itemsContainer");
+      const wheelHit = document.getElementById("wheelHit");
+      const itemsContainer = document.getElementById("itemsContainer");
       const textEditor = document.getElementById("textEditor");
       const wordCount = document.getElementById("wordCount");
 
       const MAX_WORDS = 500;
-
       const colors = [
         { bg: "#075e54", text: "white", wheelBg: "#000000" },
         { bg: "#128c7e", text: "white", wheelBg: "#000000" },
@@ -229,216 +260,213 @@
       ];
 
       let translateDistance = 135;
+      let itemRotation = 0;
+      let rafId = null;
+      let isDragging = false;
+      let lastAngle = 0;
+      let pointerStartPos = null;
+      let dragConfirmed = false;
+
+      function haptic(pattern) {
+        if (navigator.vibrate) navigator.vibrate(pattern);
+      }
 
       function updateTranslateDistance() {
         translateDistance = window.innerWidth <= 768 ? 95 : 135;
-        const items = document.querySelectorAll(".item");
+      }
+
+      function positionItems() {
+        const items = itemsContainer.querySelectorAll(".item");
         items.forEach((item, i) => {
-          const angle = i * (360 / colors.length);
-          item.style.transform = `rotate(${angle}deg) translate(${translateDistance}px) rotate(-${angle}deg)`;
+          const base = (i / colors.length) * 360;
+          const angle = base + itemRotation;
+          const rad = angle * (Math.PI / 180);
+          const x = Math.cos(rad) * translateDistance;
+          const y = Math.sin(rad) * translateDistance;
+          item.style.transform = `translate(${x}px, ${y}px)`;
         });
       }
 
-      function adjustTextareaHeight() {
-        textEditor.style.height = "auto";
-        const maxHeight = window.innerHeight - 200;
-        const newHeight = Math.min(textEditor.scrollHeight, maxHeight);
-        textEditor.style.height = newHeight + "px";
-
-        if (textEditor.scrollHeight > maxHeight) {
-          const currentValue = textEditor.value;
-          while (
-            textEditor.scrollHeight > maxHeight &&
-            textEditor.value.length > 0
-          ) {
-            textEditor.value = textEditor.value.slice(0, -1);
-            textEditor.style.height = "auto";
-            textEditor.style.height =
-              Math.min(textEditor.scrollHeight, maxHeight) + "px";
-          }
-          if (textEditor.value !== currentValue) {
-            updateWordCount();
-          }
-        }
+      function getCenterAngle(cx, cy) {
+        const rect = wheel.getBoundingClientRect();
+        const ox = rect.left + rect.width / 2;
+        const oy = rect.top + rect.height / 2;
+        return Math.atan2(cy - oy, cx - ox) * (180 / Math.PI);
       }
-
-      function countWords(text) {
-        const trimmed = text.trim();
-        if (!trimmed) return 0;
-        return trimmed.split(/\s+/).length;
-      }
-
-      function updateWordCount() {
-        const text = textEditor.value;
-        const words = countWords(text);
-        wordCount.textContent = `${words} / ${MAX_WORDS} words`;
-
-        if (words > MAX_WORDS) {
-          const wordsArray = text.trim().split(/\s+/);
-          const limitedWords = wordsArray.slice(0, MAX_WORDS);
-          textEditor.value = limitedWords.join(" ");
-          wordCount.textContent = `${MAX_WORDS} / ${MAX_WORDS} words`;
-          adjustTextareaHeight();
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const randIndex = Math.floor(Math.random() * colors.length);
-        const color = colors[randIndex];
-
-        document.body.style.backgroundColor = color.bg;
-        document.body.style.color = color.text;
-        wheel.style.borderColor = color.wheelBg;
-
-        updateWordCount();
-        updateTranslateDistance();
-        adjustTextareaHeight();
-      });
-
-      textEditor.addEventListener("input", () => {
-        adjustTextareaHeight();
-        updateWordCount();
-      });
-
-      window.addEventListener("resize", () => {
-        updateTranslateDistance();
-        adjustTextareaHeight();
-      });
 
       colors.forEach((color, i) => {
         const div = document.createElement("div");
         div.className = "item";
         div.style.backgroundColor = color.bg;
-        const angle = i * (360 / colors.length);
-        div.style.transform = `rotate(${angle}deg) translate(${translateDistance}px) rotate(-${angle}deg)`;
+        const base = (i / colors.length) * 360;
+        const rad = base * (Math.PI / 180);
+        const x = Math.cos(rad) * translateDistance;
+        const y = Math.sin(rad) * translateDistance;
+        div.style.transform = `translate(${x}px, ${y}px)`;
 
-        let clickStart = null;
-        let moved = false;
+        let pressStart = null,
+          moved = false;
 
-        div.addEventListener("mousedown", (e) => {
-          clickStart = { x: e.clientX, y: e.clientY };
+        div.addEventListener("pointerdown", (e) => {
+          pressStart = { x: e.clientX, y: e.clientY };
           moved = false;
         });
-
-        div.addEventListener("mousemove", (e) => {
-          if (clickStart) {
-            const dx = e.clientX - clickStart.x;
-            const dy = e.clientY - clickStart.y;
-            if (Math.sqrt(dx * dx + dy * dy) > 5) {
-              moved = true;
-            }
-          }
+        div.addEventListener("pointermove", (e) => {
+          if (
+            pressStart &&
+            Math.hypot(e.clientX - pressStart.x, e.clientY - pressStart.y) > 6
+          )
+            moved = true;
         });
-
-        div.addEventListener("mouseup", (e) => {
+        div.addEventListener("pointerup", (e) => {
           if (!moved) {
-            e.stopPropagation();
+            haptic(10);
             document.body.style.backgroundColor = color.bg;
             document.body.style.color = color.text;
             wheel.style.borderColor = color.wheelBg;
           }
-          clickStart = null;
+          pressStart = null;
         });
 
-        div.addEventListener("touchstart", (e) => {
-          const touch = e.touches[0];
-          clickStart = { x: touch.clientX, y: touch.clientY };
-          moved = false;
-        });
-
-        div.addEventListener("touchmove", (e) => {
-          if (clickStart) {
-            const touch = e.touches[0];
-            const dx = touch.clientX - clickStart.x;
-            const dy = touch.clientY - clickStart.y;
-            if (Math.sqrt(dx * dx + dy * dy) > 5) {
-              moved = true;
-            }
-          }
-        });
-
-        div.addEventListener("touchend", (e) => {
-          if (!moved) {
-            e.stopPropagation();
-            e.preventDefault();
-            document.body.style.backgroundColor = color.bg;
-            document.body.style.color = color.text;
-            wheel.style.borderColor = color.wheelBg;
-          }
-          clickStart = null;
-        });
-
-        container.appendChild(div);
+        itemsContainer.appendChild(div);
       });
 
-      palletBtn.addEventListener("click", () =>
-        wheel.classList.toggle("show-wheel")
-      );
+      palletBtn.addEventListener("click", () => {
+        const opening = !wheel.classList.contains("show-wheel");
+        wheel.classList.toggle("show-wheel");
+        if (opening) haptic([8, 40, 8]);
+      });
 
-      let isDragging = false,
-        startAngle = 0,
-        currentRotation = 0;
-
-      function getAngle(x, y) {
-        const rect = wheel.getBoundingClientRect();
-        return (
-          Math.atan2(
-            y - (rect.top + rect.height / 2),
-            x - (rect.left + rect.width / 2)
-          ) *
-          (180 / Math.PI)
-        );
-      }
-
-      function handleDragStart(clientX, clientY, e) {
-        if (e.target.classList.contains("item")) return;
+      function onDragStart(clientX, clientY, pointerId) {
         isDragging = true;
-        wheel.style.transition =
-          "width 0.4s, height 0.4s, border-width 0.4s, opacity 0.3s";
-        startAngle = getAngle(clientX, clientY) - currentRotation;
+        dragConfirmed = false;
+        pointerStartPos = { x: clientX, y: clientY };
+        lastAngle = getCenterAngle(clientX, clientY);
+        wheelHit.setPointerCapture(pointerId);
+        wheel.classList.add("active-wheel", "dragging");
       }
 
-      function handleDragMove(clientX, clientY) {
+      function onDragMove(clientX, clientY) {
         if (!isDragging) return;
-        currentRotation = getAngle(clientX, clientY) - startAngle;
-        wheel.style.transform = `translate(-50%, -50%) rotate(${currentRotation}deg)`;
+        if (!dragConfirmed) {
+          if (
+            Math.hypot(
+              clientX - pointerStartPos.x,
+              clientY - pointerStartPos.y,
+            ) < 6
+          )
+            return;
+          dragConfirmed = true;
+        }
+        const angle = getCenterAngle(clientX, clientY);
+        let delta = angle - lastAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        itemRotation += delta;
+        lastAngle = angle;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(positionItems);
       }
 
-      function handleDragEnd() {
+      function onDragEnd(e) {
         isDragging = false;
+        dragConfirmed = false;
+        wheel.classList.remove("dragging");
+        const rect = wheelHit.getBoundingClientRect();
+        const inside =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom;
+        if (!inside) wheel.classList.remove("active-wheel");
       }
 
-      wheel.addEventListener("mousedown", (e) => {
-        handleDragStart(e.clientX, e.clientY, e);
+      wheelHit.addEventListener("pointerdown", (e) => {
+        wheelHit.style.pointerEvents = "none";
+        const hit = document.elementFromPoint(e.clientX, e.clientY);
+        wheelHit.style.pointerEvents = "auto";
+        if (hit && hit.classList.contains("item")) return;
+        onDragStart(e.clientX, e.clientY, e.pointerId);
+        e.preventDefault();
+      });
+      wheelHit.addEventListener("pointerup", (e) => onDragEnd(e));
+      wheelHit.addEventListener("pointermove", (e) => {
+        onDragMove(e.clientX, e.clientY);
+      });
+      wheelHit.addEventListener("pointerup", (e) => onDragEnd(e));
+      wheelHit.addEventListener("pointercancel", (e) => onDragEnd(e));
+      wheelHit.addEventListener("mouseenter", () =>
+        wheel.classList.add("active-wheel"),
+      );
+      wheelHit.addEventListener("mouseleave", (e) => {
+        if (isDragging) return;
+        const to = e.relatedTarget;
+        if (
+          to &&
+          (to.classList.contains("item") || itemsContainer.contains(to))
+        )
+          return;
+        wheel.classList.remove("active-wheel");
       });
 
-      wheel.addEventListener(
-        "touchstart",
-        (e) => {
-          const touch = e.touches[0];
-          handleDragStart(touch.clientX, touch.clientY, e);
-          e.preventDefault();
-        },
-        { passive: false }
-      );
+      function adjustTextareaHeight() {
+        textEditor.style.height = "auto";
+        const maxH = window.innerHeight - 200;
+        textEditor.style.height =
+          Math.min(textEditor.scrollHeight, maxH) + "px";
+        if (textEditor.scrollHeight > maxH) {
+          while (
+            textEditor.scrollHeight > maxH &&
+            textEditor.value.length > 0
+          ) {
+            textEditor.value = textEditor.value.slice(0, -1);
+            textEditor.style.height = "auto";
+            textEditor.style.height =
+              Math.min(textEditor.scrollHeight, maxH) + "px";
+          }
+          updateWordCount();
+        }
+      }
 
-      window.addEventListener("mousemove", (e) => {
-        handleDragMove(e.clientX, e.clientY);
+      function countWords(t) {
+        const s = t.trim();
+        return s ? s.split(/\s+/).length : 0;
+      }
+
+      function updateWordCount() {
+        const words = countWords(textEditor.value);
+        wordCount.textContent = `${words} / ${MAX_WORDS} words`;
+        if (words > MAX_WORDS) {
+          textEditor.value = textEditor.value
+            .trim()
+            .split(/\s+/)
+            .slice(0, MAX_WORDS)
+            .join(" ");
+          wordCount.textContent = `${MAX_WORDS} / ${MAX_WORDS} words`;
+          adjustTextareaHeight();
+        }
+      }
+
+      textEditor.addEventListener("input", () => {
+        adjustTextareaHeight();
+        updateWordCount();
+      });
+      window.addEventListener("resize", () => {
+        updateTranslateDistance();
+        positionItems();
+        adjustTextareaHeight();
       });
 
-      window.addEventListener(
-        "touchmove",
-        (e) => {
-          if (!isDragging) return;
-          const touch = e.touches[0];
-          handleDragMove(touch.clientX, touch.clientY);
-          e.preventDefault();
-        },
-        { passive: false }
-      );
-
-      window.addEventListener("mouseup", handleDragEnd);
-      window.addEventListener("touchend", handleDragEnd);
+      document.addEventListener("DOMContentLoaded", () => {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        document.body.style.backgroundColor = color.bg;
+        document.body.style.color = color.text;
+        wheel.style.borderColor = color.wheelBg;
+        updateTranslateDistance();
+        positionItems();
+        updateWordCount();
+        adjustTextareaHeight();
+      });
     </script>
   </body>
 </html>
